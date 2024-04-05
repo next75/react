@@ -1,56 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
-function DependentDropdown() {
-  const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedCity, setSelectedCity] = useState('');
-  const [cities, setCities] = useState([]);
+const HierarchicalDropdowns = () => {
+    // Sample hierarchical data structure
+    const data = {
+        USA: {
+            California: ["Los Angeles", "San Francisco", "San Diego"],
+            Texas: ["Houston", "Dallas"]
+        },
+        Canada: {
+            Ontario: ["Toronto", "Ottawa"],
+            Quebec: ["Montreal", "Quebec City"]
+        },
+        India: {
+            Maharashtra: ["Thane", "Pune", "Mumbai"],
+            Gujrat: ["Ahmedabd", "Surat"]
+        }
+    };
 
-  // Define your country and city data
-  const countries = [
-    { name: 'USA', cities: ['New York', 'Los Angeles', 'Chicago'] },
-    { name: 'Canada', cities: ['Toronto', 'Vancouver', 'Montreal'] },
-    // Add more countries and their cities as needed
-  ];
+    const [selectedCountry, setSelectedCountry] = useState("");
+    const [selectedState, setSelectedState] = useState("");
+    const [selectedCity, setSelectedCity] = useState("");
 
-  // Function to handle country change
-  const handleCountryChange = (event) => {
-    const country = event.target.value;
-    setSelectedCountry(country);
-    // Get cities for the selected country
-    const selectedCountryObj = countries.find((c) => c.name === country);
-    setCities(selectedCountryObj ? selectedCountryObj.cities : []);
-    // Reset city selection when country changes
-    setSelectedCity('');
-  };
+    const handleCountryChange = e => {
+        setSelectedCountry(e.target.value);
+        setSelectedState("");
+        setSelectedCity("");
+    };
 
-  // Function to handle city change
-  const handleCityChange = (event) => {
-    setSelectedCity(event.target.value);
-  };
+    const handleStateChange = e => {
+        setSelectedState(e.target.value);
+        setSelectedCity("");
+    };
 
-  return (
-    <div>
-      <label htmlFor="country">Select Country:</label>
-      <select id="country" value={selectedCountry} onChange={handleCountryChange}>
-        <option value="">Select</option>
-        {countries.map((country) => (
-          <option key={country.name} value={country.name}>
-            {country.name}
-          </option>
-        ))}
-      </select>
+    return (
+        <div>
+            <label htmlFor="countryDropdown">Country:</label>
+            <select
+                id="countryDropdown"
+                value={selectedCountry}
+                onChange={handleCountryChange}
+            >
+                <option value="">Select Country</option>
+                {Object.keys(data).map(country => (
+                    <option key={country} value={country}>
+                        {country}
+                    </option>
+                ))}
+            </select>
 
-      <label htmlFor="city">Select City:</label>
-      <select id="city" value={selectedCity} onChange={handleCityChange}>
-        <option value="">Select</option>
-        {cities.map((city) => (
-          <option key={city} value={city}>
-            {city}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
+            <label htmlFor="stateDropdown">State:</label>
+            <select
+                id="stateDropdown"
+                value={selectedState}
+                onChange={handleStateChange}
+                disabled={!selectedCountry}
+            >
+                <option value="">Select State</option>
+                {selectedCountry &&
+                    data[selectedCountry] &&
+                    Object.keys(data[selectedCountry]).map(state => (
+                        <option key={state} value={state}>
+                            {state}
+                        </option>
+                    ))}
+            </select>
 
-export default DependentDropdown;
+            <label htmlFor="cityDropdown">City:</label>
+            <select
+                id="cityDropdown"
+                value={selectedCity}
+                onChange={e => setSelectedCity(e.target.value)}
+                disabled={!selectedState}
+            >
+                <option value="">Select City</option>
+                {selectedState &&
+                    data[selectedCountry][selectedState].map(city => (
+                        <option key={city} value={city}>
+                            {city}
+                        </option>
+                    ))}
+            </select>
+        </div>
+    );
+};
+
+export default HierarchicalDropdowns;
