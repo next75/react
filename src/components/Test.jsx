@@ -1,87 +1,61 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-const HierarchicalDropdowns = () => {
-    // Sample hierarchical data structure
-    const data = {
-        USA: {
-            California: ["Los Angeles", "San Francisco", "San Diego"],
-            Texas: ["Houston", "Dallas"]
-        },
-        Canada: {
-            Ontario: ["Toronto", "Ottawa"],
-            Quebec: ["Montreal", "Quebec City"]
-        },
-        India: {
-            Maharashtra: ["Thane", "Pune", "Mumbai"],
-            Gujrat: ["Ahmedabd", "Surat"]
-        }
-    };
+const questions = [
+  {
+    id: 1,
+    question: 'What is the capital of France?',
+    options: ['London', 'Paris', 'Berlin', 'Rome'],
+    correctAnswer: 'Paris'
+  },
+  {
+    id: 2,
+    question: 'What is the largest planet in our solar system?',
+    options: ['Earth', 'Jupiter', 'Mars', 'Saturn'],
+    correctAnswer: 'Jupiter'
+  },
+  // Add more questions here
+];
 
-    const [selectedCountry, setSelectedCountry] = useState("");
-    const [selectedState, setSelectedState] = useState("");
-    const [selectedCity, setSelectedCity] = useState("");
+const QuizApp = () => {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [selectedOption, setSelectedOption] = useState('');
+  const [score, setScore] = useState(0);
 
-    const handleCountryChange = e => {
-        setSelectedCountry(e.target.value);
-        setSelectedState("");
-        setSelectedCity("");
-    };
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
+  };
 
-    const handleStateChange = e => {
-        setSelectedState(e.target.value);
-        setSelectedCity("");
-    };
+  const handleNextQuestion = () => {
+    if (selectedOption === questions[currentQuestion].correctAnswer) {
+      setScore(score + 1);
+    }
+    setSelectedOption('');
+    setCurrentQuestion(currentQuestion + 1);
+  };
 
-    return (
+  return (
+    <div>
+      {currentQuestion < questions.length ? (
         <div>
-            <label htmlFor="countryDropdown">Country:</label>
-            <select
-                id="countryDropdown"
-                value={selectedCountry}
-                onChange={handleCountryChange}
-            >
-                <option value="">Select Country</option>
-                {Object.keys(data).map(country => (
-                    <option key={country} value={country}>
-                        {country}
-                    </option>
-                ))}
-            </select>
-
-            <label htmlFor="stateDropdown">State:</label>
-            <select
-                id="stateDropdown"
-                value={selectedState}
-                onChange={handleStateChange}
-                disabled={!selectedCountry}
-            >
-                <option value="">Select State</option>
-                {selectedCountry &&
-                    data[selectedCountry] &&
-                    Object.keys(data[selectedCountry]).map(state => (
-                        <option key={state} value={state}>
-                            {state}
-                        </option>
-                    ))}
-            </select>
-
-            <label htmlFor="cityDropdown">City:</label>
-            <select
-                id="cityDropdown"
-                value={selectedCity}
-                onChange={e => setSelectedCity(e.target.value)}
-                disabled={!selectedState}
-            >
-                <option value="">Select City</option>
-                {selectedState &&
-                    data[selectedCountry][selectedState].map(city => (
-                        <option key={city} value={city}>
-                            {city}
-                        </option>
-                    ))}
-            </select>
+          <h2>Question {currentQuestion + 1}:</h2>
+          <p>{questions[currentQuestion].question}</p>
+          <ul>
+            {questions[currentQuestion].options.map((option, index) => (
+              <li key={index}>
+                <button onClick={() => handleOptionSelect(option)}>{option}</button>
+              </li>
+            ))}
+          </ul>
+          <button onClick={handleNextQuestion}>Next</button>
         </div>
-    );
+      ) : (
+        <div>
+          <h2>Quiz completed!</h2>
+          <p>Your score: {score}/{questions.length}</p>
+        </div>
+      )}
+    </div>
+  );
 };
 
-export default HierarchicalDropdowns;
+export default QuizApp;
